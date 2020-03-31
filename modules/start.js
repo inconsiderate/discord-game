@@ -21,7 +21,7 @@ start = (info) => {
                 // character creation message
                 info.message.channel.send(new Discord.RichEmbed()
                 .setColor('#0099ff')
-                .setTitle(`Create New Character`)
+                .setTitle(`Create New Character ${info.message.author.tag}`)
                 .addField("Select your Job: \n", jobText))
                 .then( message => {
                     // add all Job icons as reactions
@@ -42,7 +42,7 @@ start = (info) => {
                             info.message.channel.send(new Discord.RichEmbed()
                             .setColor('#0099ff')
                             .setTitle('Create New Character')
-                            .addField("Select your starting Job Ability: \n", abilityText))
+                            .addField("Select a starting Ability for your Job", abilityText))
                             .then( message => {
                                 helper.addMultipleReactions(message, abilityIcons)
                                 helper.collectFirstReaction(info, message, abilityIcons).then((abilityReaction) => {

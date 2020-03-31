@@ -6,8 +6,7 @@ module.exports = {
 
 character = (info) => {
     db.Player.findOne({where: {id: info.message.author.id}, include: [db.Ability, db.Job] }).then((player) => {
-
-        if (!player) {info.message.channel.send("You don't have a character. Type !start to create one."); return;}
+        if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
 
         let abilitiesList = '';
 

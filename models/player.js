@@ -58,6 +58,7 @@ module.exports = (sequelize, DataTypes) => {
     Player.associate = function(models) {
         Player.belongsToMany(models.Ability, {through: 'PlayerAbility'})
         Player.belongsToMany(models.Job, {through: 'PlayerJob'})
+        Player.belongsToMany(models.Adventure, {through: 'PlayerAdventure'})
     };
 
 	return Player;

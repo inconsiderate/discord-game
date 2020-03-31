@@ -4,6 +4,7 @@ exports.execute = () => {
     createAbilities();
     // createPlayers();
     createEnemies();
+    createAdventures();
 }
 
 const createAdmins = () => {
@@ -26,7 +27,7 @@ const createPlayers = () => {
         if (!players.length) {
             console.log('No players found. Creating players...')
             db.Player.bulkCreate([
-                {id: '146365826939748353', JobId: 1}, // incon
+                {id: '146365826939748353', JobId: 1, AbilityId: 1}, // incon
                 {id: '642108520858386452', JobId: 2},
                 {id: '107901991283339264', JobId: 3}
             ])
@@ -45,7 +46,9 @@ const createJobs = () => {
             db.Job.bulkCreate([
                 {name: 'Blood Mage', emoji: '🩸'},
                 {name: 'Space Cowboy', emoji: '🤠'},
-                {name: 'Shapeshifter', emoji: '👺'}
+                {name: 'Shapeshifter', emoji: '👺'},
+                {name: 'Fist Fighter', emoji: '✊'},
+                {name: 'Pathfinder', emoji: '✊'}
             ])
             .then((newJobs) => {console.log('New jobs created.')})
             .catch((err) => {console.log("Job creation error : ", err)})
@@ -94,6 +97,30 @@ const createAbilities = () => {
             ])
             .then(() => {console.log('New abilities created.')})
             .catch((err) => {console.log("Ability creation error : ", err)})
+        }
+    })
+}
+
+const createAdventures = () => {
+    db.Adventure.findAll().then(function (adventures) {
+        if (!adventures.length) {
+            console.log('No adventures found. Creating adventures...')
+            db.Adventure.bulkCreate([
+                {
+                    title: 'Save the Werewolf King',
+                    description: 'The werewolf king has been captured by the sociopathic Princess Jade! Rescue him and reap the rewards!'
+                },
+                {
+                    title: 'Adventure 2',
+                    description: 'Find the old man'
+                },
+                {
+                    title: 'Adventure 3',
+                    description: 'Rescue the cactus'
+                }
+            ])
+            .then(() => {console.log('New adventures created.')})
+            .catch((err) => {console.log("adventures creation error : ", err)})
         }
     })
 }

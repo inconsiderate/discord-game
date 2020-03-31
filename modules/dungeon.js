@@ -20,7 +20,7 @@ combatState = {
     players: []
 }
 
-// 1. function decides which character goes first
+// 1. decides which character goes first
 // 2. [loop for all attacking characters in their order]
 // a) call attack function
 //  i) call damage calculating function? (returns default attack text)
@@ -33,14 +33,11 @@ combatState = {
 // b) append to log
 
 dungeon = (info) => {
-    console.log("Initialize dungeon");
+    console.log("Initializing dungeon");
     // set up health pool for group, determine power level, select dunegon scenes
     prepareDungeon(info, combatState).then( async () => {
-        console.log('dungeon prepared. party health: ' + combatState.partyHealth)
-
         for (scene in scenes) {
             if (sceneTransition(info, combatState, scenes[scene], scenes[scene - 1])) {
-
                 // choose an appropriate enemy for this party
                 await prepareNewEnemy(combatState);
                 // present the party with the new scene
@@ -49,7 +46,6 @@ dungeon = (info) => {
                 dungeonEnd(scene);
             };
         };
-
     })
 }
 
@@ -86,13 +82,22 @@ sceneResolution = async (info, combatState) => {
 }
 
 prepareDungeon = (info, combatState) => {
-    console.log('PREPARING DUNGEON RUN');
-
     return new Promise((resolve, reject) => {
-        // db.Player.findAll({id: [1,2,3]}).then((players) => {
-        db.Player.findAll({ order: ['speed'], include: [db.Ability] }).then(async (players) => {
-            if (!players) {
-                info.message.channel.send("This player does not have a character!");
+
+        let playerIdsArray = [];
+        if (info.msg) {
+            // strip players input down to discord IDs
+            let playerIdsString = info.msg.replace(/<|!|>|@/g, "")
+            playerIdsArray = playerIdsString.split(" ");
+        }
+
+        // add author to the list of players
+        playerIdsArray.push(info.message.author.id);
+        const playerIds = [...new Set(playerIdsArray)];
+
+        db.Player.findAll({where: {id: playerIds}, order: ['speed'], include: [db.Ability] }).then( async (players) => {            
+            if (!players.length) {
+                info.message.channel.send("One of the people you selected does not have a character!");
                 return;
             }
 
@@ -164,7 +169,8 @@ resolvePlayerTurn = (info, combatState, player, status) => {
             new Discord.RichEmbed().addField("Battle Log",`${combatState.combatLog}`)
             .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\nAtk ${player.attack} - Def ${player.defense}`,true)
             .addField(`What will you do?`, player.actions.text,true)
-            .setTitle(`It's your turn ${player.id}!`)
+            .setTitle(`It's your turn <@${player.id}> !`)
+            .setFooter(`It's your turn <@${player.id}> !`)
         ).then((message) => {
             helper.addMultipleReactions(message, player.actions.icons);
             helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
@@ -173,7 +179,7 @@ resolvePlayerTurn = (info, combatState, player, status) => {
                     console.log("player used ability: " + selectedAbility.name);
                     combatState.enemy.health -= 6;
                     // return `You attack the enemy with ${selectedAbility.attackText} for 3 damage!`;
-                    appendToCombatLog(combatState.combatLog, `${player.id} ${selectedAbility.attackText} ${combatState.enemy.name} for 6 damage!`);
+                    appendToCombatLog(combatState.combatLog, `<@${player.id}> ${selectedAbility.attackText} ${combatState.enemy.name} for 6 damage!`);
                     resolve();
                 })
             })

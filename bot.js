@@ -264,6 +264,7 @@ function call_command(info, cmd, msg) {
 	}
 	info['cmd'] = cmd;
 	info['msg'] = msg;
+	console.log('NEW COMMAND');
 	new Promise((resolve, reject) => {
 		let hrstart = process.hrtime();
 		info.bot.cmd[info['cmd']](info);
