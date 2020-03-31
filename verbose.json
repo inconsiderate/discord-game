@@ -1,0 +1,14 @@
+{
+	"active":false,
+	"voice":false,
+	"memberupdate":false,
+	"setup": {
+		"add_commands":false,
+		"bot_info":false
+	},
+	"commands":{
+		"failed_calls":false,
+		"successful_calls":false,
+		"full_call_context":false
+	}
+}
