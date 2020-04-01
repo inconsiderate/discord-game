@@ -33,7 +33,7 @@ combatState = {
 // b) append to log
 
 dungeon = (info) => {
-    console.log("Initializing dungeon");
+    console.log("STARTING DUNGEON");
     // set up health pool for group, determine power level, select dunegon scenes
     prepareDungeon(info, combatState).then( async () => {
         for (scene in scenes) {
@@ -50,9 +50,35 @@ dungeon = (info) => {
 }
 
 sceneTransition = (info, combatState, currentScene, previousScene) => {
+    if (combatState.partyHealth < 1) {
+        info.message.channel.send("Your whole party is dead LOLOLOLOL!");
+        return false;
+    } 
+
     if (previousScene) console.log(`Previous Scene: ${previousScene.title}`);
     console.log(`Current Scene: ${currentScene.title}. Continue to the next scene? YES.`);
-    appendToCombatLog(combatState.combatLog, `You have entered the ${currentScene.title}!`);
+
+    // info.message.channel.send(
+    //     new Discord.RichEmbed().addField("Battle Log",`${combatState.combatLog}`)
+    //     .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\nAtk ${player.attack} - Def ${player.defense}`,true)
+    //     .addField(`What will you do?`, player.actions.text,true)
+    //     .setTitle(`It's your turn <@${player.id}> !`)
+    //     .setFooter(`It's your turn <@${player.id}> !`)
+    // ).then((message) => {
+    //     helper.addMultipleReactions(message, player.actions.icons);
+    //     helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
+    //         db.Ability.findOne({where: {emoji: reaction.emoji.name}})
+    //         .then(function (selectedAbility) {
+    //             console.log("player used ability: " + selectedAbility.name);
+    //             combatState.enemy.health -= 6;
+    //             // return `You attack the enemy with ${selectedAbility.combatLogText} for 3 damage!`;
+    //             appendToCombatLog(combatState.combatLog, `<@${player.id}> ${selectedAbility.combatLogText} ${combatState.enemy.name} for 6 damage!`);
+    //             resolve();
+    //         })
+    //     })
+    // })
+
+    appendToCombatLog(combatState.combatLog, `\nYou have entered the ${currentScene.title}!`);
 
     return true;
 }
@@ -82,6 +108,7 @@ sceneResolution = async (info, combatState) => {
 }
 
 prepareDungeon = (info, combatState) => {
+    console.log("Preparing Dungeon");
     return new Promise((resolve, reject) => {
 
         let playerIdsArray = [];
@@ -115,11 +142,11 @@ prepareDungeon = (info, combatState) => {
 
             resolve();
         })
-
     })
 }
 
 prepareNewEnemy = (combatState) => {
+    console.log("Preparing New Enemy");
     return new Promise((resolve, reject) => {
         db.Enemy.findOne({ order: db.sequelize.random() }).then((enemy) => {
             combatState.enemy = enemy;
@@ -176,10 +203,16 @@ resolvePlayerTurn = (info, combatState, player, status) => {
             helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
                 db.Ability.findOne({where: {emoji: reaction.emoji.name}})
                 .then(function (selectedAbility) {
+                    
                     console.log("player used ability: " + selectedAbility.name);
-                    combatState.enemy.health -= 6;
-                    // return `You attack the enemy with ${selectedAbility.attackText} for 3 damage!`;
-                    appendToCombatLog(combatState.combatLog, `<@${player.id}> ${selectedAbility.attackText} ${combatState.enemy.name} for 6 damage!`);
+                    let combatText = '';
+                    if (selectedAbility.damageType) {
+                        let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 2) == 1 ? 1 : -1);
+                        combatState.enemy.health -= damage;
+                        combatText = `for ${damage} points of physical damage!`
+                    }
+                    appendToCombatLog(combatState.combatLog, `<@${player.id}> ${selectedAbility.combatLogText} ${combatState.enemy.name} ${combatText}`);
+
                     resolve();
                 })
             })
@@ -192,7 +225,7 @@ resolveEnemyAttack = (combatState, status) => {
     // append current damage totals to combatLog
     // returns combatLog with description of attack results
     combatState.partyHealth -= 3;
-    appendToCombatLog(combatState.combatLog, `Enemy attacks the party with Bite for 3 damage!`);
+    appendToCombatLog(combatState.combatLog, `${combatState.enemy.name} attacks the party with Bite for 3 damage!`);
 }
 
 appendToCombatLog = (combatLog, newCombatText) => {

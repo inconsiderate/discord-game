@@ -13,17 +13,17 @@ module.exports = (sequelize, DataTypes) => {
 		health: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 50,
+            defaultValue: 1,
         },
         attack: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 5,
+            defaultValue: 1,
         },
         defense: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 5,
+            defaultValue: 1,
         },
         speed: {
 			type: DataTypes.INTEGER,

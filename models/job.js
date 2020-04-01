@@ -29,5 +29,9 @@ module.exports = (sequelize, DataTypes) => {
 		timestamps: false
 	});
 
+    Job.associate = function(models) {
+        Job.hasMany(models.Ability, {foreignKey: 'jobId'})
+	};
+	
 	return Job;
 };

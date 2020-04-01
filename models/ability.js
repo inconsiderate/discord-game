@@ -14,19 +14,46 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: false
         },
-		attackText: {
+		combatLogText: {
 			type: DataTypes.STRING,
 			allowNull: false
         },
         emoji: {
 			type: DataTypes.STRING,
 			allowNull: false
-        },
-        power: {
+		},
+		cooldown: {
 			type: DataTypes.INTEGER,
-			allowNull: false,
-            defaultValue: 1,
-        },
+			allowNull: true
+		},
+		rank: {
+			type: DataTypes.INTEGER,
+			allowNull: true
+		},
+		damageType: {
+			type: DataTypes.INTEGER,
+			allowNull: true
+		},
+		jobId: {
+			type: DataTypes.INTEGER,
+			allowNull: true,
+			references: {
+				model: 'Job',
+				key: 'id'
+			}
+		},
+		// statusId: {
+		// 	type: DataTypes.INTEGER,
+		// 	allowNull: true,
+		// 	references: {
+		// 		model: 'Status',
+		// 		key: 'id'
+		// 	}
+		// },
+		statusChance: {
+			type: DataTypes.INTEGER,
+			allowNull: true
+		},
 		createdAt: {
 			type: DataTypes.DATE,
 			allowNull: false,

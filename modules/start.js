@@ -22,19 +22,20 @@ start = (info) => {
                 info.message.channel.send(new Discord.RichEmbed()
                 .setColor('#0099ff')
                 .setTitle(`Create New Character ${info.message.author.tag}`)
-                .addField("Select your Job: \n", jobText))
+                .addField("Select your starting Job\n", jobText))
                 .then( message => {
                     // add all Job icons as reactions
                     helper.addMultipleReactions(message, jobIcons)
                     helper.collectFirstReaction(info, message, jobIcons).then((jobReaction) => {
 
-                        db.Ability.findAll().then(function (abilities) {
+                        db.Job.findOne({where: {emoji: jobReaction.emoji.name}, include: [db.Ability] })
+                        .then(function (selectedJob) {
                             abilityIcons = [], abilityText = '';
+                            for (ability in selectedJob.Abilities) {
 
-                            for (ability in abilities) {
                                 // craft abilities message and emoji array
-                                abilityIcons.push(abilities[ability].emoji);
-                                abilityText += abilities[ability].emoji + ' ' + abilities[ability].name + ' - ' + abilities[ability].description + '\n';
+                                abilityIcons.push(selectedJob.Abilities[ability].emoji);
+                                abilityText += selectedJob.Abilities[ability].emoji + ' ' + selectedJob.Abilities[ability].name + ' - ' + selectedJob.Abilities[ability].description + '\n';
                             }
 
                             message.delete();
@@ -42,13 +43,13 @@ start = (info) => {
                             info.message.channel.send(new Discord.RichEmbed()
                             .setColor('#0099ff')
                             .setTitle('Create New Character')
-                            .addField("Select a starting Ability for your Job", abilityText))
+                            .addField("Select a starting Utility Ability for your Job", abilityText))
                             .then( message => {
                                 helper.addMultipleReactions(message, abilityIcons)
                                 helper.collectFirstReaction(info, message, abilityIcons).then((abilityReaction) => {
 
                                     // create new player with selected job
-                                    createNewPlayer(info, jobReaction, abilityReaction); return;
+                                    createNewPlayer(info, selectedJob, abilityReaction); return;
                                 })
                             })
                         })
@@ -62,23 +63,19 @@ start = (info) => {
 }
 
 function createNewPlayer(info, job, ability) {
-    // find job selected by player
-    db.Job.findOne({where: {emoji: job.emoji.name}})
-    .then(function (selectedJob) {
+    db.Ability.findOne({where: {emoji: ability.emoji.name}})
+    .then(function (selectedAbility) {
 
-        db.Ability.findOne({where: {emoji: ability.emoji.name}})
-        .then(function (selectedAbility) {
-
-            // create new player with Job and Ability
-            console.log('saving player: ' + info.message.author.id);
-            db.Player.create({ id: info.message.author.id})
-            .then((newPlayer) => {
-                newPlayer.addAbility(selectedAbility);
-                newPlayer.addJob(selectedJob);
-                console.log("New player created: ", newPlayer.id);
-                info.message.channel.send(`${info.message.author.tag} is a Level 1 ${selectedJob.emoji}${selectedJob.name}! Good luck out there!`);
-            })
-
+        // create new player with Job and Ability
+        console.log('saving player: ' + info.message.author.id);
+        db.Player.create({ id: info.message.author.id})
+        .then((newPlayer) => {
+            newPlayer.addAbility(1);
+            newPlayer.addAbility(selectedAbility);
+            newPlayer.addJob(job);
+            console.log("New player created: ", newPlayer.id);
+            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there!`);
         })
+
     })
 }

@@ -5,35 +5,25 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
             primaryKey: true
         },
-		level: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-            defaultValue: 1,
-		},
-		exp: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-            defaultValue: 0
-        },
 		max_health: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 50,
+            defaultValue: 10,
         },
 		current_health: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 50,
+            defaultValue: 10,
         },
         attack: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 5,
+            defaultValue: 1,
         },
         defense: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-            defaultValue: 5,
+            defaultValue: 1,
         },
         speed: {
 			type: DataTypes.INTEGER,
