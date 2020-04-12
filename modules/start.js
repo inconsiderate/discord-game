@@ -60,7 +60,7 @@ start = (info) => {
                 })
             })
         } else {
-            info.message.channel.send("you have already made a character!"); return;
+            info.message.channel.send("You have already made a character! (try the help command)"); return;
         }
     });
 }

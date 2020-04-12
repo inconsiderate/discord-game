@@ -1,6 +1,7 @@
 module.exports = {
     declare : function(bot) {
         bot.add_command(bot, "dungeon", dungeon);
+        bot.add_command(bot, "d", dungeon);
     }
 }
 
@@ -59,7 +60,7 @@ dungeonEnd = (scene) => {
 
 sceneTransition = (info, combatState, currentScene, previousScene) => {
     if (combatState.partyHealth < 1) {
-        info.message.channel.send("Your whole party is dead LOLOLOLOL!");
+        info.message.channel.send("Your whole party is dead LOLOLOLOL! Wow you suck.");
         return false;
     } 
 
@@ -218,7 +219,15 @@ resolveEnemyAttack = (combatState, status) => {
 
 appendToCombatLog = (combatLog, newCombatText) => {
     // trim log down to max lines then add new line
-    if (combatLog.split(/\r\n|\r|\n/).length > 6) {
+    console.log('BATTLE LOG APPEND');
+    console.log(combatLog.split(/\r\n|\r|\n/).length);
+    if (combatLog.split(/\r\n|\r|\n/).length > 3) {
+        
+        console.log('BATTLE LOG TRIMMING');
+        console.log(combatLog.substring(combatLog.indexOf("\n")));
+        console.log(combatLog.substring(combatLog.indexOf("\n") + 3));
+        console.log(combatLog.substring(combatLog.indexOf("\n") + 4));
+
         combatLog = combatLog.substring(combatLog.indexOf("\n") + 1);
     }
     combatState.combatLog += `${newCombatText}\n`;

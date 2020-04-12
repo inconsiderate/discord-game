@@ -14,11 +14,7 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.INTEGER,
 			allowNull: false,
         },
-		rank: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-        },
-		value: {
+		power: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
         },

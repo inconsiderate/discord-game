@@ -1,11 +1,6 @@
 module.exports = {
     declare : function(bot) {
         bot.add_command(bot, "character", character);
-    }
-}
-
-module.exports = {
-    declare : function(bot) {
         bot.add_command(bot, "c", character);
     }
 }
