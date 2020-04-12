@@ -11,6 +11,7 @@ scenes = {
     3: {title:"boss lair"},
 }
 
+// create empty combat state
 combatState = {
     turnOrder: [],
     partyPower: 0,
@@ -20,6 +21,8 @@ combatState = {
     players: []
 }
 
+// combat loop basically works like this
+//
 // 1. decides which character goes first
 // 2. [loop for all attacking characters in their order]
 // a) call attack function
@@ -49,6 +52,11 @@ dungeon = (info) => {
     })
 }
 
+dungeonEnd = (scene) => {
+    info.message.channel.send("you're done the dungeon!");
+    return;
+};
+
 sceneTransition = (info, combatState, currentScene, previousScene) => {
     if (combatState.partyHealth < 1) {
         info.message.channel.send("Your whole party is dead LOLOLOLOL!");
@@ -57,26 +65,6 @@ sceneTransition = (info, combatState, currentScene, previousScene) => {
 
     if (previousScene) console.log(`Previous Scene: ${previousScene.title}`);
     console.log(`Current Scene: ${currentScene.title}. Continue to the next scene? YES.`);
-
-    // info.message.channel.send(
-    //     new Discord.RichEmbed().addField("Battle Log",`${combatState.combatLog}`)
-    //     .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\nAtk ${player.attack} - Def ${player.defense}`,true)
-    //     .addField(`What will you do?`, player.actions.text,true)
-    //     .setTitle(`It's your turn <@${player.id}> !`)
-    //     .setFooter(`It's your turn <@${player.id}> !`)
-    // ).then((message) => {
-    //     helper.addMultipleReactions(message, player.actions.icons);
-    //     helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
-    //         db.Ability.findOne({where: {emoji: reaction.emoji.name}})
-    //         .then(function (selectedAbility) {
-    //             console.log("player used ability: " + selectedAbility.name);
-    //             combatState.enemy.health -= 6;
-    //             // return `You attack the enemy with ${selectedAbility.combatLogText} for 3 damage!`;
-    //             appendToCombatLog(combatState.combatLog, `<@${player.id}> ${selectedAbility.combatLogText} ${combatState.enemy.name} for 6 damage!`);
-    //             resolve();
-    //         })
-    //     })
-    // })
 
     appendToCombatLog(combatState.combatLog, `\nYou have entered the ${currentScene.title}!`);
 
@@ -191,13 +179,13 @@ resolvePlayerTurn = (info, combatState, player, status) => {
         player.actions = {};
         player.actions.text = abilitiesList;
         player.actions.icons = abilitiesIcons;
-
+        let playerName = `<@${player.id}>`;
         info.message.channel.send(
             new Discord.RichEmbed().addField("Battle Log",`${combatState.combatLog}`)
             .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\nAtk ${player.attack} - Def ${player.defense}`,true)
             .addField(`What will you do?`, player.actions.text,true)
-            .setTitle(`It's your turn <@${player.id}> !`)
-            .setFooter(`It's your turn <@${player.id}> !`)
+            .setTitle(`It's your turn ${playerName} !`)
+            .setFooter(`It's your turn ${playerName} !`)
         ).then((message) => {
             helper.addMultipleReactions(message, player.actions.icons);
             helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
@@ -211,7 +199,7 @@ resolvePlayerTurn = (info, combatState, player, status) => {
                         combatState.enemy.health -= damage;
                         combatText = `for ${damage} points of physical damage!`
                     }
-                    appendToCombatLog(combatState.combatLog, `<@${player.id}> ${selectedAbility.combatLogText} ${combatState.enemy.name} ${combatText}`);
+                    appendToCombatLog(combatState.combatLog, `${playerName} ${selectedAbility.combatLogText} ${combatState.enemy.name} ${combatText}`);
 
                     resolve();
                 })

@@ -49,6 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         Player.belongsToMany(models.Ability, {through: 'PlayerAbility'})
         Player.belongsToMany(models.Job, {through: 'PlayerJob'})
         Player.belongsToMany(models.Adventure, {through: 'PlayerAdventure'})
+        Player.belongsToMany(models.Inventory, {through: 'PlayerInventory'})
     };
 
 	return Player;

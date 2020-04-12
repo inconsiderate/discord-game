@@ -97,6 +97,7 @@ const config = require('./config/config.json');
 Discord = require('discord.js');
 db = require('./models');
 helper = require('./helpers/messages.js');
+globals = require('./helpers/globals.js');
 const fixtures = require('./config/fixtures.js');
 const verbose = require('./verbose.json');
 const fs = require("fs");

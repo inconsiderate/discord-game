@@ -125,12 +125,23 @@ const createAdventures = () => {
                     description: 'The werewolf king has been captured by the sociopathic Princess Jade! Rescue him and reap the rewards!'
                 },
                 {
-                    title: 'Adventure 2',
-                    description: 'Find the old man'
+                    title: 'The Golden Goblin',
+                    description: 'Kill and bring back the golden goblins head to the tavern keeper'
                 },
                 {
-                    title: 'Adventure 3',
-                    description: 'Rescue the cactus'
+                    title: 'Lost Cupcake Recipe',
+                    description: 'discover the lost cupcake recipe by traversing through the ancient dungeon'
+                },
+                {
+                    title: 'The Stolen Crown',
+                    description: 'hunt down a bounty hunter who stole the kings head and crown and seek revenge for the prince'
+                },
+                {
+                    title: 'Translate an Ancient Scroll',
+                    description: 'find the ancient tribe and translate an ancient scroll to stop the doomsday event'
+                },
+                {
+                    title: 'Bird Egg Quest', description: 'Find the lost bird egg and bring it back to the nest'
                 }
             ])
             .then(() => {console.log('New adventures created.')})

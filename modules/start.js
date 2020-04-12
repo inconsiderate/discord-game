@@ -49,7 +49,10 @@ start = (info) => {
                                 helper.collectFirstReaction(info, message, abilityIcons).then((abilityReaction) => {
 
                                     // create new player with selected job
-                                    createNewPlayer(info, selectedJob, abilityReaction); return;
+                                    createNewPlayer(info, selectedJob, abilityReaction)
+                                    .then( (newPlayer) => {
+                                        
+                                    }); return;
                                 })
                             })
                         })
@@ -62,7 +65,7 @@ start = (info) => {
     });
 }
 
-function createNewPlayer(info, job, ability) {
+createNewPlayer = (info, job, ability) => {
     db.Ability.findOne({where: {emoji: ability.emoji.name}})
     .then(function (selectedAbility) {
 
@@ -74,8 +77,8 @@ function createNewPlayer(info, job, ability) {
             newPlayer.addAbility(selectedAbility);
             newPlayer.addJob(job);
             console.log("New player created: ", newPlayer.id);
-            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there!`);
+            
+            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there! (type !help to get started)`);
         })
-
     })
 }

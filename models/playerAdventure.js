@@ -3,6 +3,22 @@ module.exports = (sequelize, DataTypes) => {
 		expiry: {
 			type: DataTypes.DATE,
 			allowNull: false
+		},
+		rank: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		rareChance: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		expReward: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		goldReward: {
+			type: DataTypes.INTEGER,
+			allowNull: false
 		}
 	}, {
 		tableName: 'PlayerAdventure',
