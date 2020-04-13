@@ -12,6 +12,8 @@ adventure = (info) => {
     db.Player.findOne({where: {id: info.message.author.id}, include: [db.Adventure, db.Job]}).then(player => {
         if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
         
+
+        let playerName = info.bot.users.get(player.id).username;
         // check if this player is already on an adventure
         if (player.Adventures.length) {
             var adventure = player.Adventures[0];
@@ -29,7 +31,7 @@ adventure = (info) => {
 
                 info.message.channel.send(
                     new Discord.RichEmbed()
-                    .setTitle(`${info.message.author.tag}'s Adventure Complete!`)
+                    .setTitle(`${playerName}'s adventure is complete!`)
                     .addField(`Rank ${adventure.PlayerAdventure.rank} - ${adventure.title}`, `Your adventure is complete! You have gained amazing rewards!`)
                     .addField("**Reward**",`${adventure.PlayerAdventure.expReward} exp\n${adventure.PlayerAdventure.goldReward} monies`, true)
                     .addField("**Epic Reward**",`**${epicReward}**`, true)
@@ -49,7 +51,7 @@ adventure = (info) => {
             } else {
                 info.message.channel.send(
                     new Discord.RichEmbed()
-                    .setTitle(`${info.message.author.tag}'s Adventure Progress`)
+                    .setTitle(`${playerName}'s adventure progress`)
                     .addField(`Rank ${adventure.PlayerAdventure.rank} - ${adventure.title}`, `${adventure.description}`)
                     // .addField("Reward",`${adventure.PlayerAdventure.expReward} exp\n${adventure.PlayerAdventure.goldReward} monies`, true)
                     // .addField("Potential Epic Reward",`${adventure.PlayerAdventure.rareChance}% chance`, true)
@@ -62,7 +64,7 @@ adventure = (info) => {
         } else {
             
             if (!info.msg) {
-                info.message.channel.send(`Please use **!adventure <level>**\nYour recommended adventure level: ${player.Jobs[0].PlayerJob.level}`); return;
+                info.message.channel.send(`Please use **${config.prefix}adventure <level>**\nYour recommended adventure level: ${player.Jobs[0].PlayerJob.level}`); return;
             }
 
             let rank = info.msg;
@@ -84,7 +86,7 @@ adventure = (info) => {
                 });
                 info.message.channel.send(
                     new Discord.RichEmbed()
-                    .setTitle(`${info.message.author.tag}'s Rank ${rank} Adventure Begins!`)
+                    .setTitle(`${playerName}'s rank ${rank} adventure begins!`)
                     .addField(`Rank ${rank} - ${adventure.title}`, `${adventure.description}`)
                     // .addField("Reward",`${expReward} exp\n${goldReward} monies`, true)
                     // .addField("Potential Epic Reward",`${rareChance}% chance`, true)

@@ -12,6 +12,12 @@ var expPerLevel = {
     10: 200000
 }
 
+var itemTypes = {
+    '🗡️': 'Sword',
+    '🔫': 'Gun',
+    '🦯': 'Staff'
+}
+
 var itemPrefixAdjectives = [
     'Glistening',
     'Radiant',

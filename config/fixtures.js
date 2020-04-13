@@ -12,9 +12,7 @@ const createAdmins = () => {
         if (!admins.length) {
             console.log('No admins found. Creating admins...')
             db.Admin.bulkCreate([
-                {id: '146365826939748353'}, // incon
-                {id: '642108520858386452'},
-                {id: '107901991283339264'}
+                {id: '146365826939748353'} // incon
             ])
             .then((newAdmins) => {console.log('New admins created.')})
             .catch((err) => {console.log("Admin creation error : ", err)})
@@ -71,25 +69,39 @@ const createAbilities = () => {
                 },
                 // wizard
                 {name: 'Smoke Screen',
-                    description: 'Toss a ball of living flame at your enemy',
-                    combatLogText: "conjures a ball of fire and throws it at the enemy",
-                    emoji: '🔥',
+                    description: 'Conjure a wall of smoke to hinder enemy attacks',
+                    combatLogText: "conjures a wall of smoke to obscure the vision of the enemy",
+                    emoji: '🌫️',
+                    rank: 1,
+                    jobId: 1
+                },
+                {name: 'Smoke Screen',
+                    description: 'Conjure a wall of smoke to hinder enemy attacks',
+                    combatLogText: "conjures a wall of smoke to obscure the vision of the enemy",
+                    emoji: '🌫️',
                     rank: 1,
                     jobId: 1
                 },
                 // gunslinger
-                {name: 'Triple Shot',
-                    description: 'Fire your gun three times in quick succession',
-                    combatLogText: "quickly fires three times at the enemy",
+                {name: 'Overcharge',
+                    description: "Overcharge your weapon's energy cells for extra power",
+                    combatLogText: "routes extra power into their weapon!",
+                    emoji: '🔫',
+                    rank: 1,
+                    jobId: 2
+                },
+                {name: 'Overcharge',
+                    description: "Overcharge your weapon's energy cells for extra power",
+                    combatLogText: "routes extra power into their weapon!",
                     emoji: '🔫',
                     rank: 1,
                     jobId: 2
                 },
                 // shapeshifter
-                {name: 'Pencil Jab',
-                    description: 'Jab a pencil into an eye socket',
-                    combatLogText: "jabs a pencil into the enemy's eye",
-                    emoji: '✏️',
+                {name: 'Turtle Shell',
+                    description: 'Shift your back into a turtle shell for extra protection',
+                    combatLogText: "shifts into a turtle form, gaining extra protection",
+                    emoji: '🐢',
                     rank: 1,
                     jobId: 3
                 },
@@ -104,7 +116,14 @@ const createAbilities = () => {
                 {name: 'Steal',
                     description: 'Plunder money or goods from the enemy',
                     combatLogText: "attempts to steal from the enemy",
-                    emoji: '🏹',
+                    emoji: '🕵️',
+                    rank: 1,
+                    jobId: 5
+                },
+                {name: 'Steal',
+                    description: 'Plunder money or goods from the enemy',
+                    combatLogText: "attempts to steal from the enemy",
+                    emoji: '🕵️',
                     rank: 1,
                     jobId: 5
                 }

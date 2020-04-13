@@ -93,7 +93,7 @@
  *
  *******************************/
 
-const config = require('./config/config.json');
+config = require('./config/config.json');
 Discord = require('discord.js');
 db = require('./models');
 helper = require('./helpers/messages.js');
@@ -148,24 +148,6 @@ bot.once('ready', () => {
     db.Admin.findAll({attributes: ['id']}).then(function (list) {
     	for (i in list) bot.admins.push(list[i].id);
     });
-
-    // bot.sql.prepare("CREATE TABLE IF NOT EXISTS admins (id CHAR(18));").run();
-	// let adminsresult = bot.sql.prepare("SELECT id FROM admins;").all();
-	// if (adminsresult.length == 0) {
-	// 	bot.sql.prepare(`INSERT INTO admins (id) VALUES (${BOT_ADMINS.join("), (")});`).run();
-	// 	adminsresult = bot.sql.prepare("SELECT id FROM admins;").all();
-	// }
-	// for (i in adminsresult) bot.admins.push(adminsresult[i]['id']);
-
-	/*bot.sql.query("CREATE TABLE IF NOT EXISTS admins (id CHAR(18));", function (createerr, createresult) {
-        if (createerr) throw createerr;
-        console.log(createresult);
-		bot.sql.query("SELECT id FROM admins;", function (adminserr, adminsresult) {
-			if (adminserr) throw 	adminserr;
-			for (i in adminsresult) for (j in adminsresult[i]) bot.admins.push(adminsresult[i][j]);
-			if (verbose) console.log('Admins: %j',bot.admins);
-		});
-	});*/
 
 	//add activity handlers
 	bot.add_active = add_active;

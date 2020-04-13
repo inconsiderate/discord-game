@@ -17,7 +17,8 @@
     "sqlite3": "^4.1.1"
   },
   "scripts": {
-    "start": "node bot.js",
+    "start": "pm2 start bot.js --name 'InconRPG' --watch; pm2 monit",
+    "stop": "pm2 stop InconRPG",
     "test": "mocha --recursive"
   }
 }

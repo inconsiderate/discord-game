@@ -78,7 +78,8 @@ createNewPlayer = (info, job, ability) => {
             newPlayer.addJob(job);
             console.log("New player created: ", newPlayer.id);
             
-            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there! (type !help to get started)`);
+            
+            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there! (type &help to get started)`);
         })
     })
 }

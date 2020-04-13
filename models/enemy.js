@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
             defaultValue: 1,
         },
-        attack: {
+        power: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
             defaultValue: 1,

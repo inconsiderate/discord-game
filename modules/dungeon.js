@@ -16,6 +16,7 @@ scenes = {
 combatState = {
     turnOrder: [],
     partyPower: 0,
+    partyDefense: 0,
     partyHealth: 0,
     partyMaxHealth: 0,
     combatLog: '',
@@ -54,7 +55,7 @@ dungeon = (info) => {
 }
 
 dungeonEnd = (scene) => {
-    info.message.channel.send("you're done the dungeon!");
+    info.message.channel.send("You're done the dungeon! Rewards coming soon :( ");
     return;
 };
 
@@ -155,7 +156,7 @@ prepareNewEnemy = (combatState) => {
             }
             combatState.enemy.maxHealth = combatState.enemy.health;
 
-            appendToCombatLog(combatState.combatLog, `You are attack by a ${combatState.enemy.name}!`);
+            appendToCombatLog(combatState.combatLog, `You are attacked by a ${combatState.enemy.name}!`);
 
             resolve();
         })
@@ -164,7 +165,6 @@ prepareNewEnemy = (combatState) => {
 }
 
 resolvePlayerTurn = (info, combatState, player, status) => {
-
     return new Promise((resolve, reject) => {
 
         // prepare player abilities
@@ -180,13 +180,12 @@ resolvePlayerTurn = (info, combatState, player, status) => {
         player.actions = {};
         player.actions.text = abilitiesList;
         player.actions.icons = abilitiesIcons;
-        let playerName = `<@${player.id}>`;
+        let playerName = info.bot.users.get(player.id).username;
         info.message.channel.send(
             new Discord.RichEmbed().addField("Battle Log",`${combatState.combatLog}`)
-            .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\nAtk ${player.attack} - Def ${player.defense}`,true)
+            .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\n Party Power ${combatState.partyPower} - Party Defense ${combatState.partyDefense}`,true)
             .addField(`What will you do?`, player.actions.text,true)
-            .setTitle(`It's your turn ${playerName} !`)
-            .setFooter(`It's your turn ${playerName} !`)
+            .setTitle(`It's your turn ${playerName}!`)
         ).then((message) => {
             helper.addMultipleReactions(message, player.actions.icons);
             helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
@@ -196,7 +195,7 @@ resolvePlayerTurn = (info, combatState, player, status) => {
                     console.log("player used ability: " + selectedAbility.name);
                     let combatText = '';
                     if (selectedAbility.damageType) {
-                        let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 2) == 1 ? 1 : -1);
+                        let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 2) == 1 ? 1 : 0);
                         combatState.enemy.health -= damage;
                         combatText = `for ${damage} points of physical damage!`
                     }
