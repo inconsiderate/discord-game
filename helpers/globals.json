@@ -10,5 +10,6 @@
         "9": 100000,
         "10": 200000
     },
-    "dungeonCooldownMinutes": 2
+    "dungeonCooldownMinutes": 1,
+    "dungeonCombatLogLineLimit": 2
   }

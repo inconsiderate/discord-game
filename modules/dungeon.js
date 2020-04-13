@@ -55,26 +55,32 @@ dungeon = (info) => {
                 await sceneResolution(info, combatState);
             } else {
                 dungeonEnd(info, scene);
+                break;
             };
         };
     })
 }
 
 dungeonEnd = (info, scene) => {
+    if (combatState.partyHealth < 1) {
+        info.message.channel.send("You are dead. LOLOLOLOL Wow you suck.");
+        return false;
+    } 
+
     info.message.channel.send("Dungeon Complete Placeholder!");
     return;
 };
 
 sceneTransition = (info, combatState, currentScene, previousScene) => {
     if (combatState.partyHealth < 1) {
-        info.message.channel.send("You are dead. LOLOLOLOL Wow you suck.");
         return false;
     } 
 
-    if (previousScene) console.log(`Previous Scene: ${previousScene.title}`);
-    console.log(`Current Scene: ${currentScene.title}. Continue to the next scene? YES.`);
-
-    appendToCombatLog(combatState.combatLog, `\nYou have entered ${currentScene.title}!`);
+    if (previousScene) {
+        combatState.combatLog = `You have left ${previousScene.title}, and entered ${currentScene.title}\n`
+    } else {
+        appendToCombatLog(combatState.combatLog, `You have entered ${currentScene.title}!\n`);
+    }
 
     return true;
 }
@@ -130,7 +136,7 @@ prepareDungeon = (info, combatState) => {
                     if (player.activeDungeon != null) {
                         // if it's been long enough, clear this players dungeon cooldown
                         if (moment().isAfter(moment(player.activeDungeon))) {
-                            info.message.channel.send(`(remove this message once player cooldowns are visible on character sheet)<@${player.id}> - It's been more than ${globals.dungeonCooldownMinutes} minutes since your last dungeon was activated. Clearing your cooldown timer!`);
+                            info.message.channel.send(`<@${player.id}> - It's been more than ${globals.dungeonCooldownMinutes} minutes since your last dungeon was activated. Clearing your cooldown timer! -- (remove this message once player cooldowns are visible on character sheet)`);
                             player.update({activeDungeon: null})
                         } else {
                             // player started a dungeon less than 5 minutes ago
@@ -144,6 +150,7 @@ prepareDungeon = (info, combatState) => {
                     players.forEach(function(player) {
                         combatState.partyHealth += player.current_health;
                         combatState.partyPower += player.attack;
+                        combatState.partyDefense += player.defense;
                         combatState.players.push(player);
 
                         // player does not have an active dungeon. Make this one active!
@@ -154,6 +161,7 @@ prepareDungeon = (info, combatState) => {
                 // set party starting health and attack power
                 // this can be better later, but right now we just need numbers
                 combatState.partyPower = (combatState.partyPower / players.length);
+                combatState.partyDefense = (combatState.partyDefense / players.length);
                 combatState.partyHealth = (combatState.partyHealth / players.length);
                 combatState.partyMaxHealth = combatState.partyHealth;
             }
@@ -184,7 +192,7 @@ prepareNewEnemy = (combatState) => {
             }
             combatState.enemy.maxHealth = combatState.enemy.health;
 
-            appendToCombatLog(combatState.combatLog, `You are attacked by a ${combatState.enemy.name}!`);
+            appendToCombatLog(combatState.combatLog, `You are attacked by a ${combatState.enemy.name}!\n`);
 
             resolve();
         })
@@ -228,13 +236,12 @@ resolvePlayerTurn = (info, combatState, player, status) => {
                         console.log("player used ability: " + selectedAbility.name);
                         let combatText = '';
                         if (selectedAbility.damageType) {
-                            let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 10) == 1 ? 1 : -1);
+                            let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 10) == 1 ? 1 : 4);
                             combatState.enemy.health -= damage;
                             combatText = `for ${damage} points of physical damage!`
                         }
                         appendToCombatLog(combatState.combatLog, `${playerName} ${selectedAbility.combatLogText} ${combatState.enemy.name} ${combatText}`);
-    
-    
+
                         resolve();
                     })
                 }
@@ -248,23 +255,15 @@ resolveEnemyAttack = (combatState, status) => {
     // append current damage totals to combatLog
     // returns combatLog with description of attack results
     combatState.partyHealth -= 3;
-    appendToCombatLog(combatState.combatLog, `${combatState.enemy.name} attacks the party with Bite for 3 damage!`);
+    appendToCombatLog(combatState.combatLog, `${combatState.enemy.name} attacks the party with Bite for 3 damage!\n`);
 }
 
 appendToCombatLog = (combatLog, newCombatText) => {
     // trim log down to max lines then add new line
-    console.log('BATTLE LOG APPEND');
-    console.log(combatLog.split(/\r\n|\r|\n/).length);
-    if (combatLog.split(/\r\n|\r|\n/).length > 3) {
-        
-        console.log('BATTLE LOG TRIMMING');
-        console.log(combatLog.substring(combatLog.indexOf("\n")));
-        console.log(combatLog.substring(combatLog.indexOf("\n") + 3));
-        console.log(combatLog.substring(combatLog.indexOf("\n") + 4));
-
-        combatLog = combatLog.substring(combatLog.indexOf("\n") + 1);
+    if (combatLog.split(/\r\n|\r|\n/).length > globals.dungeonCombatLogLineLimit) {
+        combatState.combatLog = combatLog.substring(combatLog.indexOf("\n") + 1);
     }
-    combatState.combatLog += `${newCombatText}\n`;
+    combatState.combatLog += `${newCombatText}`;
 
     return;
 }
