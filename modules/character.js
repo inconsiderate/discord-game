@@ -23,7 +23,7 @@ character = (info) => {
         info.message.channel.send(
             new Discord.RichEmbed()
             .addField(`${info.message.author.tag}`, `Level ${player.Jobs[0].PlayerJob.level} ${player.Jobs[0].name}`, true)
-            .addField(`Next Level`, `${player.Jobs[0].PlayerJob.exp}/${globals.expForNextLevel(player.Jobs[0].PlayerJob.level + 1)}`, true)
+            .addField(`Next Level`, `${player.Jobs[0].PlayerJob.exp}/${globals.expPerLevel[player.Jobs[0].PlayerJob.level + 1]}`, true)
             .addField('Stats',`Health Points: ${player.max_health}\nAttack: ${player.attack}\nDefense: ${player.defense}`, true)
             .addField('Abilities', `${abilitiesList}`, true)
             .addField("Inventory", inventoryList)

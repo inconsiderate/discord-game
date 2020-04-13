@@ -25,9 +25,8 @@ start = (info) => {
                 .addField("Select your starting Job\n", jobText))
                 .then( message => {
                     // add all Job icons as reactions
-                    helper.addMultipleReactions(message, jobIcons)
-                    helper.collectFirstReaction(info, message, jobIcons).then((jobReaction) => {
-
+                    messageHelpers.addMultipleReactions(message, jobIcons)
+                    messageHelpers.collectFirstReaction(info, message, jobIcons, info.message.author.id).then((jobReaction) => {
                         db.Job.findOne({where: {emoji: jobReaction.emoji.name}, include: [db.Ability] })
                         .then(function (selectedJob) {
                             abilityIcons = [], abilityText = '';
@@ -45,14 +44,10 @@ start = (info) => {
                             .setTitle('Create New Character')
                             .addField("Select a starting Utility Ability for your Job", abilityText))
                             .then( message => {
-                                helper.addMultipleReactions(message, abilityIcons)
-                                helper.collectFirstReaction(info, message, abilityIcons).then((abilityReaction) => {
-
+                                messageHelpers.addMultipleReactions(message, abilityIcons)
+                                messageHelpers.collectFirstReaction(info, message, abilityIcons, info.message.author.id).then((abilityReaction) => {
                                     // create new player with selected job
                                     createNewPlayer(info, selectedJob, abilityReaction)
-                                    .then( (newPlayer) => {
-                                        
-                                    }); return;
                                 })
                             })
                         })
@@ -60,7 +55,7 @@ start = (info) => {
                 })
             })
         } else {
-            info.message.channel.send("You have already made a character! (try the help command)"); return;
+            info.message.channel.send(`You have already made a character! (try ${config.prefix}help to get started)`); return;
         }
     });
 }
@@ -78,8 +73,8 @@ createNewPlayer = (info, job, ability) => {
             newPlayer.addJob(job);
             console.log("New player created: ", newPlayer.id);
             
-            
-            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there! (type &help to get started)`);
+
+            info.message.channel.send(`${info.message.author.tag} is a Level 1 ${job.emoji}${job.name}! Good luck out there! (type ${config.prefix}help to get started)`);
         })
     })
 }

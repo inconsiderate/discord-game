@@ -9,7 +9,7 @@ module.exports = {
 help = (info) => {
     info.message.channel.send(
         new Discord.RichEmbed()
-        .setTitle('Help Menu')
+        .setTitle(`${config.prefix}help / ${config.prefix}h - This help menu!`)
         .addField(`General`, `**${config.prefix}start** - Create a new character and start playing\n**${config.prefix}character / ${config.prefix}c** - Display your character details\n**${config.prefix}inventory / ${config.prefix}i** - Display your inventory (COMING SOON)`)
         .addField(`Dungeon`, `**${config.prefix}dungeon @player1 @player2 @player3** - Enter the dungeon with up to 3 friends\n**${config.prefix}dungeonDetails** - Get details about today's dungeon (COMING SOON)`)
         .addField(`Adventure`, `**${config.prefix}adventure [level] / ${config.prefix}a [level]** - Send your character out on an idle adventure to gain experience and loot`)

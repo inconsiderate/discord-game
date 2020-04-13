@@ -4,7 +4,7 @@ exports.gainExp = (player, exp) => {
     // add exp to this job
     playerJob.exp += exp;
     // is this enough exp to level up?
-    if (playerJob.exp >= globals.expForNextLevel(playerJob.level + 1)) {
+    if (playerJob.exp >= globals.expPerLevel[playerJob.level + 1]) {
         playerJob.level += 1;
     } 
 

@@ -24,10 +24,10 @@ adventure = (info) => {
 
                 // // does this player deserve an epic reward?
                 // if (Math.random() < adventure.PlayerAdventure.rareChance) {
-                //     let epicReward = globals.createRandomWeapon();
+                //     let epicReward = globalHelpers.createRandomWeapon();
                 // }
 
-                let epicReward = globals.createRandomWeapon();
+                let epicReward = globalHelpers.createRandomWeapon();
 
                 info.message.channel.send(
                     new Discord.RichEmbed()

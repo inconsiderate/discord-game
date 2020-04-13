@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 module.exports = {
     declare : function(bot) {
         bot.add_command(bot, "dungeon", dungeon);
@@ -6,21 +8,10 @@ module.exports = {
 }
 
 scenes = {
-    0: {title:"cave entrance"},
-    1: {title:"hallway"},
-    2: {title:"underground lake"},
-    3: {title:"boss lair"},
-}
-
-// create empty combat state
-combatState = {
-    turnOrder: [],
-    partyPower: 0,
-    partyDefense: 0,
-    partyHealth: 0,
-    partyMaxHealth: 0,
-    combatLog: '',
-    players: []
+    0: {title:"the cave entrance"},
+    1: {title:"an ominous hallway"},
+    2: {title:"the shore of an underground lake"},
+    3: {title:"bosses lair"},
 }
 
 // combat loop basically works like this
@@ -38,9 +29,24 @@ combatState = {
 // b) append to log
 
 dungeon = (info) => {
-    console.log("STARTING DUNGEON");
+    // initialize empty combat state
+    combatState = {
+        turnOrder: [],
+        partyPower: 0,
+        partyDefense: 0,
+        partyHealth: 0,
+        partyMaxHealth: 0,
+        combatLog: '',
+        players: []
+    }
+
     // set up health pool for group, determine power level, select dunegon scenes
-    prepareDungeon(info, combatState).then( async () => {
+    prepareDungeon(info, combatState).then( async (result) => {
+        if (result == false) {
+            // problem was found - do not start dungeon
+            return false;
+        } 
+
         for (scene in scenes) {
             if (sceneTransition(info, combatState, scenes[scene], scenes[scene - 1])) {
                 // choose an appropriate enemy for this party
@@ -48,27 +54,27 @@ dungeon = (info) => {
                 // present the party with the new scene
                 await sceneResolution(info, combatState);
             } else {
-                dungeonEnd(scene);
+                dungeonEnd(info, scene);
             };
         };
     })
 }
 
-dungeonEnd = (scene) => {
-    info.message.channel.send("You're done the dungeon! Rewards coming soon :( ");
+dungeonEnd = (info, scene) => {
+    info.message.channel.send("Dungeon Complete Placeholder!");
     return;
 };
 
 sceneTransition = (info, combatState, currentScene, previousScene) => {
     if (combatState.partyHealth < 1) {
-        info.message.channel.send("Your whole party is dead LOLOLOLOL! Wow you suck.");
+        info.message.channel.send("You are dead. LOLOLOLOL Wow you suck.");
         return false;
     } 
 
     if (previousScene) console.log(`Previous Scene: ${previousScene.title}`);
     console.log(`Current Scene: ${currentScene.title}. Continue to the next scene? YES.`);
 
-    appendToCombatLog(combatState.combatLog, `\nYou have entered the ${currentScene.title}!`);
+    appendToCombatLog(combatState.combatLog, `\nYou have entered ${currentScene.title}!`);
 
     return true;
 }
@@ -112,25 +118,47 @@ prepareDungeon = (info, combatState) => {
         playerIdsArray.push(info.message.author.id);
         const playerIds = [...new Set(playerIdsArray)];
 
-        db.Player.findAll({where: {id: playerIds}, order: ['speed'], include: [db.Ability] }).then( async (players) => {            
-            if (!players.length) {
+        let continueDungeon = true;
+        db.Player.findAll({where: {id: playerIds}, order: ['speed'], include: [db.Ability] }).then( async (players) => {    
+            // do we have a player result for each ID?
+            if (players.length != playerIds.length) {
                 info.message.channel.send("One of the people you selected does not have a character!");
-                return;
+                continueDungeon = false;
+            } else {
+                players.forEach(function(player) {
+                    // are any of the players already in an active dungeon?
+                    if (player.activeDungeon != null) {
+                        // if it's been long enough, clear this players dungeon cooldown
+                        if (moment().isAfter(moment(player.activeDungeon))) {
+                            info.message.channel.send(`(remove this message once player cooldowns are visible on character sheet)<@${player.id}> - It's been more than ${globals.dungeonCooldownMinutes} minutes since your last dungeon was activated. Clearing your cooldown timer!`);
+                            player.update({activeDungeon: null})
+                        } else {
+                            // player started a dungeon less than 5 minutes ago
+                            info.message.channel.send(`<@${player.id}> - You're either in an active dungeon or still on cooldown! Return to it, or wait ${moment.duration(moment().diff(moment(player.activeDungeon))).humanize()} to start a new one.`);
+                            continueDungeon = false;
+                        }
+                    }
+                })
+
+                if (continueDungeon) {
+                    players.forEach(function(player) {
+                        combatState.partyHealth += player.current_health;
+                        combatState.partyPower += player.attack;
+                        combatState.players.push(player);
+
+                        // player does not have an active dungeon. Make this one active!
+                        player.update({activeDungeon: moment().add(globals.dungeonCooldownMinutes, 'minutes').toDate()})
+                    })
+                }
+
+                // set party starting health and attack power
+                // this can be better later, but right now we just need numbers
+                combatState.partyPower = (combatState.partyPower / players.length);
+                combatState.partyHealth = (combatState.partyHealth / players.length);
+                combatState.partyMaxHealth = combatState.partyHealth;
             }
-
-            // set party starting health and attack power
-            for (player in players) {
-                combatState.partyHealth += players[player].current_health;
-                combatState.partyPower += players[player].attack;
-                combatState.players.push(players[player]);
-            }
-
-            // this can be more elaborate later, but right now we just need a number
-            combatState.partyPower = (combatState.partyPower / players.length);
-            combatState.partyHealth = (combatState.partyHealth / players.length);
-            combatState.partyMaxHealth = combatState.partyHealth;
-
-            resolve();
+            
+            resolve(continueDungeon);
         })
     })
 }
@@ -183,26 +211,33 @@ resolvePlayerTurn = (info, combatState, player, status) => {
         let playerName = info.bot.users.get(player.id).username;
         info.message.channel.send(
             new Discord.RichEmbed().addField("Battle Log",`${combatState.combatLog}`)
-            .addField("Stats",`${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\n Party Power ${combatState.partyPower} - Party Defense ${combatState.partyDefense}`,true)
+            .addField("Stats",`**${combatState.enemy.name} HP: ${combatState.enemy.health}/${combatState.enemy.maxHealth}**\n Party HP: ${combatState.partyHealth}/${combatState.partyMaxHealth}\nParty Power: ${combatState.partyPower}\nParty Defense: ${combatState.partyDefense}`,true)
             .addField(`What will you do?`, player.actions.text,true)
             .setTitle(`It's your turn ${playerName}!`)
         ).then((message) => {
-            helper.addMultipleReactions(message, player.actions.icons);
-            helper.collectFirstReaction(info, message, player.actions.icons).then((reaction) => {
-                db.Ability.findOne({where: {emoji: reaction.emoji.name}})
-                .then(function (selectedAbility) {
-                    
-                    console.log("player used ability: " + selectedAbility.name);
-                    let combatText = '';
-                    if (selectedAbility.damageType) {
-                        let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 2) == 1 ? 1 : 0);
-                        combatState.enemy.health -= damage;
-                        combatText = `for ${damage} points of physical damage!`
-                    }
-                    appendToCombatLog(combatState.combatLog, `${playerName} ${selectedAbility.combatLogText} ${combatState.enemy.name} ${combatText}`);
-
+            messageHelpers.addMultipleReactions(message, player.actions.icons);
+            messageHelpers.collectFirstReaction(info, message, player.actions.icons, player.id).then((reaction) => {
+                if (reaction == false) {
+                    // message timed out, no reply!
+                    appendToCombatLog(combatState.combatLog, `${playerName} did not take any action!`);
                     resolve();
-                })
+                } else {
+                    db.Ability.findOne({where: {emoji: reaction.emoji.name}})
+                    .then(function (selectedAbility) {
+                        
+                        console.log("player used ability: " + selectedAbility.name);
+                        let combatText = '';
+                        if (selectedAbility.damageType) {
+                            let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 10) == 1 ? 1 : -1);
+                            combatState.enemy.health -= damage;
+                            combatText = `for ${damage} points of physical damage!`
+                        }
+                        appendToCombatLog(combatState.combatLog, `${playerName} ${selectedAbility.combatLogText} ${combatState.enemy.name} ${combatText}`);
+    
+    
+                        resolve();
+                    })
+                }
             })
         })
     })

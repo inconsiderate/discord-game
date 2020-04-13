@@ -62,7 +62,7 @@ const createAbilities = () => {
                 // default level 1 attack
                 {name: 'Slap',
                     description: 'A hard slap across the face',
-                    combatLogText: "slaps the enemy",
+                    combatLogText: "slaps the",
                     damageType: 1,
                     emoji: '👋',
                     rank: 1
@@ -70,14 +70,14 @@ const createAbilities = () => {
                 // wizard
                 {name: 'Smoke Screen',
                     description: 'Conjure a wall of smoke to hinder enemy attacks',
-                    combatLogText: "conjures a wall of smoke to obscure the vision of the enemy",
+                    combatLogText: "conjures a wall of smoke to obscure the vision of the",
                     emoji: '🌫️',
                     rank: 1,
                     jobId: 1
                 },
                 {name: 'Smoke Screen',
                     description: 'Conjure a wall of smoke to hinder enemy attacks',
-                    combatLogText: "conjures a wall of smoke to obscure the vision of the enemy",
+                    combatLogText: "conjures a wall of smoke to obscure the vision of the",
                     emoji: '🌫️',
                     rank: 1,
                     jobId: 1
@@ -115,14 +115,14 @@ const createAbilities = () => {
                 // prowler
                 {name: 'Steal',
                     description: 'Plunder money or goods from the enemy',
-                    combatLogText: "attempts to steal from the enemy",
+                    combatLogText: "attempts to steal from the",
                     emoji: '🕵️',
                     rank: 1,
                     jobId: 5
                 },
                 {name: 'Steal',
                     description: 'Plunder money or goods from the enemy',
-                    combatLogText: "attempts to steal from the enemy",
+                    combatLogText: "attempts to steal from the",
                     emoji: '🕵️',
                     rank: 1,
                     jobId: 5

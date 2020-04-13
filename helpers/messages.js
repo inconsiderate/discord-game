@@ -14,18 +14,22 @@ exports.addMultipleReactions = (message, reactions) => {
 }
 
 // @param {array} reactions - array of emojis
-exports.collectFirstReaction = (info, message, reactions) => {
+exports.collectFirstReaction = (info, message, reactions, expectedClicker) => {
     return new Promise((resolve, reject) => {
         const filter = (reaction, user) => {
-            return reactions.includes(reaction.emoji.name) && user.id === info.message.author.id;
+            console.log(user.id + ' ' + expectedClicker)
+            // only accept this reaction if it is sent by expectedClicker
+            return reactions.includes(reaction.emoji.name) && user.id === expectedClicker;
         };
 
+        // wait 30 seconds for a reply
         message.awaitReactions(filter, { max: 1, time: 30000, errors: ['time'] })
         .then(collected => {
             resolve(collected.first());
         })
         .catch(collected => {
-            info.message.channel.send('you did not reply in time!');
+            // return no reply
+            resolve(false);
         });
     })
 }

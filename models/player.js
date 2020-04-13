@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
             defaultValue: 1,
         },
+        activeDungeon: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null
+        },
         speed: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
