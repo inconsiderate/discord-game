@@ -1,17 +1,4 @@
 
-// how much exp is required to gain each level
-var expPerLevel = {
-    2: 100,
-    3: 500,
-    4: 1500,
-    5: 3000,
-    6: 7500,
-    7: 18000,
-    8: 40000,
-    9: 100000,
-    10: 200000
-}
-
 var itemTypes = {
     '🗡️': 'Sword',
     '🔫': 'Gun',

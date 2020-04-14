@@ -1,10 +1,10 @@
 exports.execute = () => {
     createJobs();
     createAdmins();
-    // createPlayers();
     createEnemies();
     createAdventures();
-    createAbilities();
+    createAbilities()
+    // createFakePlayers();
 }
 
 const createAdmins = () => {
@@ -20,20 +20,22 @@ const createAdmins = () => {
     })
 }
 
-const createPlayers = () => {
-    db.Player.findAll().then(function (players) {
-        if (!players.length) {
-            console.log('No players found. Creating players...')
-            db.Player.bulkCreate([
-                {id: '146365826939748353', JobId: 1, AbilityId: 1}, // incon
-                {id: '642108520858386452', JobId: 2},
-                {id: '107901991283339264', JobId: 3}
-            ])
-            .then((newPlayers) => {
-                console.log('New players created.')
+const createFakePlayers = () => {
+    db.Job.findOne({where: {id: 1} })
+    .then(selectedJob => {
+        console.log('found a job: ' + selectedJob.name)
+        db.Ability.findOne({where: {id: 2}})
+        .then(selectedAbility => {
+            console.log('found an ability: ' + selectedAbility.name)
+            // create new player with Job and Ability
+            db.Player.create({ id: 146365826939748353})
+            .then(newPlayer => {
+                newPlayer.addAbility(1);
+                newPlayer.addAbility(selectedAbility);
+                newPlayer.addJob(selectedJob);
+                console.log("NEW PLAYER CREATED: ", newPlayer.id);
             })
-            .catch((err) => {console.log("Player creation error : ", err)})
-        }
+        })
     })
 }
 

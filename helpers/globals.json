@@ -11,5 +11,22 @@
         "10": 200000
     },
     "dungeonCooldownMinutes": 1,
-    "dungeonCombatLogLineLimit": 2
-  }
+    "dungeonCombatLogLineLimit": 2,
+    "craftingMaterials": {
+        "wood": {
+            "1": "rank 1 wood",
+            "2": "rank 2 wood",
+            "3": "rank 3 wood"
+        },
+        "metal": {
+            "1": "rank 1 metal",
+            "2": "rank 2 metal",
+            "3": "rank 3 metal"
+        },
+        "herb": {
+            "1": "rank 1 herb",
+            "2": "rank 2 herb",
+            "3": "rank 3 herb"
+        }
+    }
+}

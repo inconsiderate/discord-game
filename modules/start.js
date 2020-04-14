@@ -8,6 +8,8 @@ start = (info) => {
     db.Player.findOne({where: {id: info.message.author.id}}).then(function (player) {
         if (!player) {
 
+
+            let playerName = info.bot.users.get(info.message.author.id).username;
             // fetch all available Job options
             db.Job.findAll({attributes: ['name', 'emoji']}, {raw: true}).then(function (jobs) {
                 jobIcons = [], jobText = '';
@@ -21,7 +23,7 @@ start = (info) => {
                 // character creation message
                 info.message.channel.send(new Discord.RichEmbed()
                 .setColor('#0099ff')
-                .setTitle(`Create New Character ${info.message.author.tag}`)
+                .setTitle(`Create New Character ${playerName}`)
                 .addField("Select your starting Job\n", jobText))
                 .then( message => {
                     // add all Job icons as reactions
