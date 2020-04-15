@@ -28,6 +28,7 @@ adventure = (info) => {
 
                 // give player exp and possibly new level if they level up
                 playerHelpers.gainExp(player, adventure.PlayerAdventure.expReward);
+                playerHelpers.gainMonies(player, adventure.PlayerAdventure.goldReward);
 
                 // destroy this adventure
                 
@@ -67,8 +68,8 @@ adventure = (info) => {
             let rareChance = 5;
             let expReward = Math.ceil(rank * (Math.random() * 100));
             let goldReward = Math.ceil(rank * (Math.random() * 30));
-            // let expiry = moment().add((player.Jobs[0].PlayerJob.level * (Math.random() * 15)) * rank, 'minutes');
-            let expiry = moment().add(2, 'seconds');
+            let expiry = moment().add((player.Jobs[0].PlayerJob.level * (Math.random() * 15)) * rank, 'minutes');
+            // let expiry = moment().add(2, 'seconds'); // two second timer for testing
 
             db.Adventure.findOne({ order: db.sequelize.random() })
             .then((adventure) => {

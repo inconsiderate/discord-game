@@ -41,11 +41,9 @@ exports.createRandomWeapon = _ => {
         console.log('creating new sword');
         db.Inventory.create(item)
         .then((newItem) => {
-            console.log("New SWORD created: ", newItem.id);
-            
+            console.log("New SWORD created: ", newItem.id);  
             resolve(newItem);
         })
-    
     })
 }
 

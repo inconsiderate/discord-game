@@ -11,6 +11,11 @@ exports.gainExp = (player, exp) => {
     playerJob.save()
 }
 
+exports.gainMonies = (player, monies) => {
+    player.monies += monies;
+    player.save()
+}
+
 exports.gainInventory = (player, itemName, type, power) => {
     console.log(player.Inventory);
 }
