@@ -6,7 +6,7 @@ module.exports = {
 }
 
 character = (info) => {
-    db.Player.findOne({where: {id: info.message.author.id}, include: [db.Ability, db.Job] }).then((player) => {
+    db.Player.findOne({where: {id: info.message.author.id}, include: [db.Ability, db.Job, db.Inventory] }).then((player) => {
 
         if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
         let abilitiesList = '', inventoryList = '';
@@ -14,11 +14,10 @@ character = (info) => {
         for (ability in player.Abilities) {
             abilitiesList += `${player.Abilities[ability].emoji} ${player.Abilities[ability].name} - ${player.Abilities[ability].description}\n`;
         }
-        
-        // for (item in player.Inventory) {
-            // inventoryList += `${player.Inventory[item].equipped} ${player.Inventory[item].emoji} ${player.Inventory[item].name} - ${player.Inventory[item].description}  \n`;
-            inventoryList = `418 monies\n+1 Throbbing Sword of The Eldest God\nShining Armor of Glancing Blows`;
-        // }
+
+        player.Inventories.forEach(item => {
+            inventoryList += `${item.name}\n`;            
+        });
 
         info.message.channel.send(
             new Discord.RichEmbed()
@@ -26,7 +25,7 @@ character = (info) => {
             .addField(`Next Level`, `${player.Jobs[0].PlayerJob.exp}/${globals.expPerLevel[player.Jobs[0].PlayerJob.level + 1]}`, true)
             .addField('Stats',`Health Points: ${player.max_health}\nAttack: ${player.attack}\nDefense: ${player.defense}`, true)
             .addField('Abilities', `${abilitiesList}`, true)
-            .addField("Inventory", inventoryList)
+            .addField("Inventory", `${player.monies} monies\n` + inventoryList)
         )
     })
 }

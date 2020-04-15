@@ -26,18 +26,27 @@ exports.expForNextLevel = (nextLevel) => {
 }
 
 exports.createRandomWeapon = _ => {
-    let itemName = '';
-    if (Math.random() < 0.7) {
-        let prefix = itemPrefixAdjectives[Math.floor(Math.random() * itemPrefixAdjectives.length)];
-        itemName = prefix;
-    }
-    itemName += ' Sword';
-    if (Math.random() < 0.7) {
-        let suffix = itemSufffixAdjectives[Math.floor(Math.random() * itemSufffixAdjectives.length)];
-        itemName += ` ${suffix}`;
-    }
+    return new Promise((resolve, reject) => {
+        let item = {name: '', type: 1, power: 1};
+        if (Math.random() < 0.7) {
+            let prefix = itemPrefixAdjectives[Math.floor(Math.random() * itemPrefixAdjectives.length)];
+            item.name = prefix;
+        }
+        item.name += ' Sword';
+        if (Math.random() < 0.7) {
+            let suffix = itemSufffixAdjectives[Math.floor(Math.random() * itemSufffixAdjectives.length)];
+            item.name += ` ${suffix}`;
+        }
         
-    return itemName;
+        console.log('creating new sword');
+        db.Inventory.create(item)
+        .then((newItem) => {
+            console.log("New SWORD created: ", newItem.id);
+            
+            resolve(newItem);
+        })
+    
+    })
 }
 
 exports.createRandomArmor = _ => {

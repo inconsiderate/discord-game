@@ -12,7 +12,6 @@ adventure = (info) => {
     db.Player.findOne({where: {id: info.message.author.id}, include: [db.Adventure, db.Job]}).then(player => {
         if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
         
-
         let playerName = info.bot.users.get(player.id).username;
         // check if this player is already on an adventure
         if (player.Adventures.length) {
@@ -21,30 +20,25 @@ adventure = (info) => {
             
             // the adventure is complete
             if (moment().isAfter(expiry)) {
-
-                // // does this player deserve an epic reward?
-                // if (Math.random() < adventure.PlayerAdventure.rareChance) {
-                //     let epicReward = globalHelpers.createRandomWeapon();
-                // }
-
-                let epicReward = globalHelpers.createRandomWeapon();
-
-                info.message.channel.send(
-                    new Discord.RichEmbed()
+                
+                completeMsg = new Discord.RichEmbed()
                     .setTitle(`${playerName}'s adventure is complete!`)
                     .addField(`Rank ${adventure.PlayerAdventure.rank} - ${adventure.title}`, `Your adventure is complete! You have gained amazing rewards!`)
                     .addField("**Reward**",`${adventure.PlayerAdventure.expReward} exp\n${adventure.PlayerAdventure.goldReward} monies`, true)
-                    .addField("**Epic Reward**",`**${epicReward}**`, true)
-                )
-                    
-                // give player new gear if they proc an item reward
-                // playerHelpers.gainInventory(player, epicReward);
+
+                epicRewardCheck().then(epicReward => {
+                    if (epicReward) {
+                        completeMsg.addField("**Epic Reward**",`**${epicReward.name}**`, true)
+                    }
+                })
 
                 // give player exp and possibly new level if they level up
                 playerHelpers.gainExp(player, adventure.PlayerAdventure.expReward);
-                
-            // destroy this adventure
+
+                // destroy this adventure
                 db.PlayerAdventure.destroy({where:{PlayerId: player.id}});
+                info.message.channel.send(completeMsg)
+
                 return;
 
             // the adventure is still in progress
@@ -93,6 +87,25 @@ adventure = (info) => {
                     .addField("Time Remaining",`${moment.duration(expiry.diff(moment())).humanize()}`, true)
                 )
             })
+        }
+    })
+}
+
+epicRewardCheck = () => {
+    return new Promise((resolve, reject) => {
+        // does this player deserve an epic reward?
+        let roll = Math.random();
+        console.log('player chance: ' + adventure.PlayerAdventure.rareChance + ' || roll: ' + roll)
+
+        if (roll < adventure.PlayerAdventure.rareChance) {
+        // if (Math.random() < adventure.PlayerAdventure.rareChance) {
+            globalHelpers.createRandomWeapon().then(epicReward => {
+                db.Player.findOne({where: {id: info.message.author.id}, include: [db.Inventory]}).then(player => {
+                    player.addInventory(epicReward.id);
+
+                    resolve(epicReward)
+                })
+            });
         }
     })
 }

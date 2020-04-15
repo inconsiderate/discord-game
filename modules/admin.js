@@ -28,14 +28,18 @@ function giveExp(info) {
 // give X item to player as if they looted it
 function giveRandomItem(info) {
 	if (info.admin) {
-
         if (!info.msg) {
             info.message.channel.send(`Please use **${config.prefix}giveitem <rank>** for this command`); return;
         }
-        
 		try{
-			eval(info.msg);
-		} catch (e) {
+            globalHelpers.createRandomWeapon().then(epicReward => {
+                console.log('finding player')
+                db.Player.findOne({where: {id: info.message.author.id}, include: [db.Inventory]}).then(player => {
+                    player.addInventory(epicReward.id);
+                    console.log('added to player inventory')
+                })
+            });
+        } catch (e) {
 			console.log(e);
 		}
 	}
