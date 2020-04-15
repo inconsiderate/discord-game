@@ -3,6 +3,7 @@ module.exports = {
         bot.add_command(bot, "character", character);
         bot.add_command(bot, "c", character);
         bot.add_command(bot, "equip", equip);
+        bot.add_command(bot, "sell", sell);
     }
 }
 
@@ -33,7 +34,7 @@ character = (info) => {
 }
 
 equip = (info) => {
-    console.log('trying to equip something')
+    console.log('trying to EQUIP something')
     db.Player.findOne({where: {id: info.message.author.id}, include: [db.Inventory] }).then((player) => {
         if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
 
@@ -50,6 +51,32 @@ equip = (info) => {
                 player.save()
 
                 info.message.channel.send('equipped ' + item.name);
+            }            
+        });
+
+    })
+}
+
+sell = (info) => {
+    let input = info.msg.replace(/<|!|>|@/g, "")
+    inputVars = input.split(" ");
+
+    db.Player.findOne({
+        where: { id: info.message.author.id },
+        include: [db.Inventory, {
+            model: db.Inventory,
+            where: { id: inputVars[0] }
+        }] 
+    }).then((player) => {
+        if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
+            player.Inventories.forEach(item => {
+                if (inputVars[0] == item.id) {
+                console.log('trying to SELL item: ' + item.id)
+                db.Inventory.destroy({where: {id:item.id} });
+                player.monies += 1
+                player.save()
+
+                info.message.channel.send('Sold ' + item.name + ' for 1 monies');
             }            
         });
 
