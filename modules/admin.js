@@ -1,9 +1,9 @@
 module.exports = {
     declare : function(bot) {
-        bot.add_command(bot, "giveexp", giveExp);
-        bot.add_command(bot, "giveitem", giveRandomItem);
+        bot.add_command(bot, "admingiveexp", giveExp);
+        bot.add_command(bot, "admingiveitem", giveRandomItem);
         bot.add_command(bot, "init", init);
-        bot.add_command(bot, "fake", fakePlayers);
+        bot.add_command(bot, "adminfake", fakePlayers);
     }
 }
 

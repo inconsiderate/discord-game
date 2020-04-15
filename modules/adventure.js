@@ -26,21 +26,23 @@ adventure = (info) => {
                     .addField(`Rank ${adventure.PlayerAdventure.rank} - ${adventure.title}`, `Your adventure is complete! You have gained amazing rewards!`)
                     .addField("**Reward**",`${adventure.PlayerAdventure.expReward} exp\n${adventure.PlayerAdventure.goldReward} monies`, true)
 
-                epicRewardCheck().then(epicReward => {
-                    if (epicReward) {
-                        completeMsg.addField("**Epic Reward**",`**${epicReward.name}**`, true)
-                    }
-                })
-
                 // give player exp and possibly new level if they level up
                 playerHelpers.gainExp(player, adventure.PlayerAdventure.expReward);
 
                 // destroy this adventure
-                db.PlayerAdventure.destroy({where:{PlayerId: player.id}});
-                info.message.channel.send(completeMsg)
+                
+                epicRewardCheck(info.message.author.id, adventure.PlayerAdventure.rareChance).then( epicReward => {
+                    console.log('is there a reward?')
+                    if (epicReward) {
+                        console.log('yes there is a REWARD!')
+                        completeMsg.addField("**Epic Reward**",`**${epicReward.name}**`, true)
+                    }
+                    info.message.channel.send(completeMsg)
+                    db.PlayerAdventure.destroy({where:{PlayerId: player.id}});
+                })
 
                 return;
-
+                
             // the adventure is still in progress
             } else {
                 info.message.channel.send(
@@ -65,7 +67,8 @@ adventure = (info) => {
             let rareChance = 5;
             let expReward = Math.ceil(rank * (Math.random() * 100));
             let goldReward = Math.ceil(rank * (Math.random() * 30));
-            let expiry = moment().add((player.Jobs[0].PlayerJob.level * (Math.random() * 15)) * rank, 'minutes');
+            // let expiry = moment().add((player.Jobs[0].PlayerJob.level * (Math.random() * 15)) * rank, 'minutes');
+            let expiry = moment().add(2, 'seconds');
 
             db.Adventure.findOne({ order: db.sequelize.random() })
             .then((adventure) => {
@@ -91,21 +94,24 @@ adventure = (info) => {
     })
 }
 
-epicRewardCheck = () => {
+epicRewardCheck = (playerId, target) => {
+    console.log('does this player deserve an EPIC REWARD')
+    // does this player deserve an epic reward?
     return new Promise((resolve, reject) => {
-        // does this player deserve an epic reward?
-        let roll = Math.random();
-        console.log('player chance: ' + adventure.PlayerAdventure.rareChance + ' || roll: ' + roll)
+        let roll = Math.random() * 10;
 
-        if (roll < adventure.PlayerAdventure.rareChance) {
-        // if (Math.random() < adventure.PlayerAdventure.rareChance) {
+        console.log('target: ' + target + ' || roll: ' + roll)
+
+        if (target < roll) {
+        // if (Math.random() * 10 > target) {
             globalHelpers.createRandomWeapon().then(epicReward => {
-                db.Player.findOne({where: {id: info.message.author.id}, include: [db.Inventory]}).then(player => {
+                db.Player.findOne({where: {id: playerId}, include: [db.Inventory]}).then(async player => {
                     player.addInventory(epicReward.id);
-
                     resolve(epicReward)
                 })
             });
+        } else {
+            resolve(false)
         }
     })
 }

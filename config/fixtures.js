@@ -151,7 +151,7 @@ const createAdventures = () => {
                 },
                 {
                     title: 'Lost Cupcake Recipe',
-                    description: "Scour the depths of the Ruinous Dungeon to recover Sara's the lost cupcake recipe."
+                    description: "Scour the depths of the Ruinous Dungeon to recover Sara's lost cupcake recipe."
                 },
                 {
                     title: 'The Stolen Crown',
