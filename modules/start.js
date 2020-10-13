@@ -27,7 +27,7 @@ start = (info) => {
                 .addField("Select your starting Job\n", jobText))
                 .then( message => {
                     // add all Job icons as reactions
-                    messageHelpers.addMultipleReactions(message, jobIcons)
+                    messageHelpers.addMultipleReactions(message, jobIcons);
                     messageHelpers.collectFirstReaction(info, message, jobIcons, info.message.author.id).then((jobReaction) => {
                         db.Job.findOne({where: {emoji: jobReaction.emoji.name}, include: [db.Ability] })
                         .then(function (selectedJob) {

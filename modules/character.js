@@ -18,16 +18,16 @@ character = (info) => {
         }
 
         player.Inventories.forEach(item => {
-            if (item.equipped) inventoryList += `✔️ `
+            if (item.PlayerInventory.equipped) inventoryList += `✔️ `
             inventoryList += `(#${item.id}) ${item.name} - Power ${item.power}\n`;            
         });
 
         info.message.channel.send(
             new Discord.RichEmbed()
             .addField(`${info.message.author.tag}`, `Level ${player.Jobs[0].PlayerJob.level} ${player.Jobs[0].name}`, true)
-            .addField(`Next Level`, `${player.Jobs[0].PlayerJob.exp}/${globals.expPerLevel[player.Jobs[0].PlayerJob.level + 1]}`, true)
-            .addField('Stats',`Health Points: ${player.max_health}\nPower: ${player.attack}\nDefense: ${player.defense}`, true)
-            .addField('Abilities', `${abilitiesList}`, true)
+            .addField(`Next Level`, `${player.Jobs[0].PlayerJob.exp}/${globals.expPerLevel[player.Jobs[0].PlayerJob.level + 1]} xp`, true)
+            .addField('Stats',`Health: ${player.max_health}\nPower: ${player.attack}\nDefense: ${player.defense}`, true)
+            .addField('Dungeon Abilities', `${abilitiesList}`, true)
             .addField("Inventory", `${player.monies} monies\n` + inventoryList)
         )
     })
@@ -43,12 +43,17 @@ equip = (info) => {
 
 
         player.Inventories.forEach(item => {
-            console.log(item.id + ' ' + input[0])
+            console.log(item.id + ' ' + inputVars[0])
 
-            if (input[0] == item.id) {
+
+            if (inputVars[0] == item.id) {
+                item.updateAttributes({
+                    equipped: 1
+                })
+
                 console.log('trying to equip item: ' + item.id)
-                item.equipped = 1;
-                player.save()
+                // item.equipped = 1;
+                // item.save()
 
                 info.message.channel.send('equipped ' + item.name);
             }            

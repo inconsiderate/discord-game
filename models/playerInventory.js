@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
 	const PlayerInventory = sequelize.define('PlayerInventory', {
 		equipped: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: 1
+            defaultValue: 0
 		}
 	}, {
 		tableName: 'PlayerInventory',

@@ -13,11 +13,16 @@ exports.addMultipleReactions = (message, reactions) => {
     );
 }
 
+
 // @param {array} reactions - array of emojis
+// @param {integer} expectedClicked - discord user id
+//
 exports.collectFirstReaction = (info, message, reactions, expectedClicker) => {
+    console.log(user.id + ' ' + expectedClicker);
     return new Promise((resolve, reject) => {
-        const filter = (reaction, user) => {
-            console.log(user.id + ' ' + expectedClicker)
+        const filter = (reaction, info.message.author.id) => {
+
+            console.log('inside filter: ' + user.id + ' ' + expectedClicker)
             // only accept this reaction if it is sent by expectedClicker
             return reactions.includes(reaction.emoji.name) && user.id === expectedClicker;
         };

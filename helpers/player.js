@@ -5,10 +5,10 @@ exports.gainExp = (player, exp) => {
     playerJob.exp += exp;
     // is this enough exp to level up?
     if (playerJob.exp >= globals.expPerLevel[playerJob.level + 1]) {
-        playerJob.level += 1;
+        levelUp(playerJob);
     } 
 
-    playerJob.save()
+    playerJob.save();
 }
 
 exports.gainMonies = (player, monies) => {
@@ -18,4 +18,10 @@ exports.gainMonies = (player, monies) => {
 
 exports.gainInventory = (player, itemName, type, power) => {
     console.log(player.Inventory);
+}
+
+
+levelUp = (playerJob) => {
+    playerJob.level += 1;
+    playerJob.save();
 }

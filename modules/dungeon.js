@@ -250,7 +250,6 @@ resolvePlayerTurn = (info, combatState, player, status) => {
     })
 }
 
-
 resolveEnemyAttack = (combatState, status) => {
     // save effects to current health totals and status of player & enemy
     // append current damage totals to combatLog
