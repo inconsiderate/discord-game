@@ -255,7 +255,7 @@ resolveEnemyAttack = (combatState, status) => {
     // append current damage totals to combatLog
     // returns combatLog with description of attack results
     combatState.partyHealth -= 3;
-    appendToCombatLog(combatState.combatLog, `${combatState.enemy.name} attacks the party with Bite for 3 damage!\n`);
+    appendToCombatLog(combatState.combatLog, `${combatState.enemy.name} attacks the party with Bite for 3 damage!`);
 }
 
 appendToCombatLog = (combatLog, newCombatText) => {
@@ -263,7 +263,7 @@ appendToCombatLog = (combatLog, newCombatText) => {
     if (combatLog.split(/\r\n|\r|\n/).length > globals.dungeonCombatLogLineLimit) {
         combatState.combatLog = combatLog.substring(combatLog.indexOf("\n") + 1);
     }
-    combatState.combatLog += `${newCombatText}`;
+    combatState.combatLog += `${newCombatText}\n`;
 
     return;
 }
