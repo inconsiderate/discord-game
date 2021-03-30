@@ -10,9 +10,10 @@ module.exports = {
 scenes = {
     0: {title:"the cave entrance"},
     1: {title:"an ominous hallway"},
-    2: {title:"the shore of an underground lake"},
-    3: {title:"bosses lair"},
+    2: {title:"the shores of an underground lake"},
+    3: {title:"the bosses lair"},
 }
+
 
 // combat loop basically works like this
 //
@@ -53,11 +54,10 @@ dungeon = (info) => {
                 await prepareNewEnemy(combatState);
                 // present the party with the new scene
                 await sceneResolution(info, combatState);
-            } else {
-                dungeonEnd(info, scene);
-                break;
             };
         };
+
+        dungeonEnd(info, scene);
     })
 }
 
@@ -77,9 +77,9 @@ sceneTransition = (info, combatState, currentScene, previousScene) => {
     } 
 
     if (previousScene) {
-        combatState.combatLog = `You have left ${previousScene.title}, and entered ${currentScene.title}\n`
+        appendToCombatLog(combatState.combatLog, `\nYou have left ${previousScene.title}, and entered ${currentScene.title}.`);
     } else {
-        appendToCombatLog(combatState.combatLog, `You have entered ${currentScene.title}!\n`);
+        appendToCombatLog(combatState.combatLog, `You have entered ${currentScene.title}!`);
     }
 
     return true;
@@ -88,20 +88,29 @@ sceneTransition = (info, combatState, currentScene, previousScene) => {
 sceneResolution = async (info, combatState) => {
     // loop until one side is dead
     while (combatState.partyHealth > 0 && combatState.enemy.health > 0) {
+        console.log('resolving scene)');
         for (player in combatState.turnOrder) {
             // only Enemy has Name attribute, so this is Enemy
             if (combatState.turnOrder[player].name) {
-                console.log('enemy turn');
+                console.log('enemy turn! party: ' + combatState.partyHealth + ' enemy: ' + combatState.enemy.health);
                 // check if enemy has a status (poison take damage, frozen/sleeping skip turn, etc)
                 // status = checkStatus(combatState, player);
                 status = false;
                 resolveEnemyAttack(combatState, status);
             } else {
-                console.log('player turn');
+                console.log('player turn! party: ' + combatState.partyHealth + ' enemy: ' + combatState.enemy.health);
                 // check if player has a status
                 // status = checkStatus(combatState, player);
                 status = false;
                 await resolvePlayerTurn(info, combatState, combatState.turnOrder[player], status);
+
+                // check if this enemy is toast
+                if (combatState.enemy.health < 1) {
+                    console.log('enemy is DEAD, submitting enemy dead text');
+                    appendToCombatLog(combatState.combatLog, `${combatState.enemy.name} has been utterly destroyed!`);
+                    break;
+                }
+
             }
         }
     }
@@ -128,7 +137,7 @@ prepareDungeon = (info, combatState) => {
         db.Player.findAll({where: {id: playerIds}, order: ['speed'], include: [db.Ability] }).then( async (players) => {    
             // do we have a player result for each ID?
             if (players.length != playerIds.length) {
-                info.message.channel.send("One of the people you selected does not have a character!");
+                info.message.channel.send("One of the players you selected does not have a character!");
                 continueDungeon = false;
             } else {
                 players.forEach(function(player) {
@@ -139,7 +148,7 @@ prepareDungeon = (info, combatState) => {
                             info.message.channel.send(`<@${player.id}> - It's been more than ${globals.dungeonCooldownMinutes} minutes since your last dungeon was activated. Clearing your cooldown timer! -- (remove this message once player cooldowns are visible on character sheet)`);
                             player.update({activeDungeon: null})
                         } else {
-                            // player started a dungeon less than 5 minutes ago
+                            // player started a dungeon less than CD minutes ago, good to go!
                             info.message.channel.send(`<@${player.id}> - You're either in an active dungeon or still on cooldown! Return to it, or wait ${moment.duration(moment().diff(moment(player.activeDungeon))).humanize()} to start a new one.`);
                             continueDungeon = false;
                         }
@@ -192,7 +201,7 @@ prepareNewEnemy = (combatState) => {
             }
             combatState.enemy.maxHealth = combatState.enemy.health;
 
-            appendToCombatLog(combatState.combatLog, `You are attacked by a ${combatState.enemy.name}!\n`);
+            appendToCombatLog(combatState.combatLog, `You are attacked by a ${combatState.enemy.name}!`);
 
             resolve();
         })
@@ -236,7 +245,7 @@ resolvePlayerTurn = (info, combatState, player, status) => {
                         console.log("player used ability: " + selectedAbility.name);
                         let combatText = '';
                         if (selectedAbility.damageType) {
-                            let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 10) == 1 ? 1 : 4);
+                            let damage = Math.max((selectedAbility.rank * combatState.partyPower) + Math.floor(Math.random() * 10) == 1 ? 70 : 60);
                             combatState.enemy.health -= damage;
                             combatText = `for ${damage} points of physical damage!`
                         }
@@ -260,7 +269,7 @@ resolveEnemyAttack = (combatState, status) => {
 
 appendToCombatLog = (combatLog, newCombatText) => {
     // trim log down to max lines then add new line
-    if (combatLog.split(/\r\n|\r|\n/).length > globals.dungeonCombatLogLineLimit) {
+    if (combatLog.split(/\r\n|\r|\n/).length > 8) {
         combatState.combatLog = combatLog.substring(combatLog.indexOf("\n") + 1);
     }
     combatState.combatLog += `${newCombatText}\n`;
