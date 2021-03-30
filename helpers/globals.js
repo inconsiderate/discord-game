@@ -19,6 +19,8 @@ var itemPrefixAdjectives = [
 var itemSufffixAdjectives = [
     'of the Eldest Gods',
     '+1',
+    'with Sparkly Bits On Top',
+    'of Hardening'
 ]
 
 exports.expForNextLevel = (nextLevel) => {

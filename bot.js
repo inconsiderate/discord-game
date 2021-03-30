@@ -103,6 +103,7 @@ const fixtures = require('./config/fixtures.js');
 const verbose = require('./verbose.json');
 const fs = require("fs");
 
+
 // initialize database tables
 db.sequelize.sync();
 

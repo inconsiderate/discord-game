@@ -13,13 +13,15 @@ character = (info) => {
         if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
         let abilitiesList = '', inventoryList = '';
 
+        // list all the player's current abilities
         for (ability in player.Abilities) {
             abilitiesList += `${player.Abilities[ability].emoji} ${player.Abilities[ability].name} - ${player.Abilities[ability].description}\n`;
         }
 
+        // list all inventory items
         player.Inventories.forEach(item => {
             if (item.PlayerInventory.equipped) inventoryList += `✔️ `
-            inventoryList += `(#${item.id}) ${item.name} - Power ${item.power}\n`;            
+            inventoryList += `${item.id}) ${item.name} (Power ${item.power})\n`;
         });
 
         info.message.channel.send(
@@ -36,26 +38,25 @@ character = (info) => {
 equip = (info) => {
     console.log('trying to EQUIP something')
     db.Player.findOne({where: {id: info.message.author.id}, include: [db.Inventory] }).then((player) => {
-        if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
+        if (!player) {info.message.channel.send(`You don't have a character. Use **${config.prefix}start** to create one.`); return;}
+        if (!info.msg) {info.message.channel.send(`Please use **${config.prefix}equip <item_id>** for this command`); return;}
 
         let input = info.msg.replace(/<|!|>|@/g, "")
         inputVars = input.split(" ");
 
-
         player.Inventories.forEach(item => {
             console.log(item.id + ' ' + inputVars[0])
 
-
             if (inputVars[0] == item.id) {
-                item.updateAttributes({
-                    equipped: 1
-                })
+                // item.updateAttributes({
+                //     equipped: 1
+                // })
 
                 console.log('trying to equip item: ' + item.id)
-                // item.equipped = 1;
-                // item.save()
+                item.equipped = 1;
+                item.save()
 
-                info.message.channel.send('equipped ' + item.name);
+                info.message.channel.send(`${info.message.author.tag} equipped the ` + item.name);
             }            
         });
 
@@ -74,14 +75,15 @@ sell = (info) => {
         }] 
     }).then((player) => {
         if (!player) {info.message.channel.send("You don't have a character. Use start to create one."); return;}
-            player.Inventories.forEach(item => {
-                if (inputVars[0] == item.id) {
-                console.log('trying to SELL item: ' + item.id)
+
+        player.Inventories.forEach(item => {
+            if (inputVars[0] == item.id) {
+                console.log('trying to SELL item: ' + item.id + ` for ${item.value}`);
+                player.monies += item.value;
                 db.Inventory.destroy({where: {id:item.id} });
-                player.monies += 1
                 player.save()
 
-                info.message.channel.send('Sold ' + item.name + ' for 1 monies');
+                info.message.channel.send(`${info.message.author.tag} sold the ` + item.name + ' for 1 monies');
             }            
         });
 

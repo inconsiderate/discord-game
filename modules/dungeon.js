@@ -269,7 +269,7 @@ resolveEnemyAttack = (combatState, status) => {
 
 appendToCombatLog = (combatLog, newCombatText) => {
     // trim log down to max lines then add new line
-    if (combatLog.split(/\r\n|\r|\n/).length > 8) {
+    if (combatLog.split(/\r\n|\r|\n/).length > globals.dungeonCombatLogLineLimit) {
         combatState.combatLog = combatLog.substring(combatLog.indexOf("\n") + 1);
     }
     combatState.combatLog += `${newCombatText}\n`;
